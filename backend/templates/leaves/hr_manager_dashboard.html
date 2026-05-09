@@ -1,0 +1,54 @@
+{% extends 'base.html' %}
+
+{% block content %}
+<div class="container">
+    <div class="alert alert-danger mb-4">
+        <h4>HR Manager Dashboard</h4>
+    </div>
+    
+    <div class="card">
+        <div class="card-header bg-danger text-white">
+            <h5>Pending Approvals</h5>
+        </div>
+        <div class="card-body">
+            {% if pending_requests %}
+            <div class="table-responsive">
+                <table class="table table-hover">
+                    <thead>
+                        <tr>
+                            <th>Employee</th>
+                            <th>Department</th>
+                            <th>Leave Type</th>
+                            <th>Dates</th>
+                            <th>Days</th>
+                            <th>Reason</th>
+                            <th>Actions</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% for request in pending_requests %}
+                        <tr>
+                            <td>{{ request.employee.get_full_name|default:request.employee.username }}</td>
+                            <td>{{ request.employee.department.name|default:'-' }}</td>
+                            <td>{{ request.get_leave_type_display }}</td>
+                            <td>{{ request.start_date|date:"M d" }} - {{ request.end_date|date:"M d" }}</td>
+                            <td>{{ request.days_requested }}</td>
+                            <td>{{ request.reason|truncatechars:40 }}</td>
+                            <td>
+                                <a href="{% url 'leaves:leave-decision' request.pk %}"
+                                   class="btn btn-sm btn-primary">
+                                    Review
+                                </a>
+                            </td>
+                        </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+            {% else %}
+            <div class="alert alert-info mb-0">No pending requests</div>
+            {% endif %}
+        </div>
+    </div>
+</div>
+{% endblock %}

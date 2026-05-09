@@ -1,0 +1,33 @@
+<!doctype html>
+<html>
+<head>
+  <meta charset="utf-8">
+  <title>HR Dashboard - LMS</title>
+  <meta name="viewport" content="width=device-width,initial-scale=1">
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.1/dist/css/bootstrap.min.css" rel="stylesheet">
+</head>
+<body>
+<div class="container py-5">
+  <h1>HR Manager Dashboard</h1>
+  <div id="content">Loading...</div>
+</div>
+<script>
+(async function(){
+  const token = localStorage.getItem('authToken');
+  if(!token){
+    window.location.href = '/accounts/login/';
+    return;
+  }
+  try{
+    const r = await fetch('/api/leaves/requests/', {headers:{'Authorization': 'Token '+token}});
+    if(!r.ok) throw new Error('Unauthorized');
+    const list = await r.json();
+    document.getElementById('content').textContent = 'Pending requests: '+list.length;
+  }catch(e){
+    localStorage.removeItem('authToken');
+    window.location.href = '/accounts/login/';
+  }
+})();
+</script>
+</body>
+</html>

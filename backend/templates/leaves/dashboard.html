@@ -1,0 +1,75 @@
+{% extends 'base.html' %}
+
+{% block content %}
+<div class="container mt-4">
+    <div class="card shadow">
+        <div class="card-header bg-primary text-white">
+            <div class="d-flex justify-content-between align-items-center">
+                <h2 class="mb-0">Leave Management Dashboard</h2>
+                {% if user.is_authenticated %}
+                <a href="{% url 'logout' %}" class="btn btn-light btn-sm">
+                    <i class="fas fa-sign-out-alt"></i> Logout
+                </a>
+                {% endif %}
+            </div>
+        </div>
+        
+        <div class="card-body">
+            {% if user.is_authenticated %}
+                <div class="alert alert-success">
+                    <h4>Welcome, {{ user.get_full_name|default:user.username }}!</h4>
+                    <p class="mb-0">Employee ID: {{ user.employee_id }}</p>
+                </div>
+                
+                <div class="row mt-4">
+                    <div class="col-md-6 mb-3">
+                        <div class="card h-100">
+                            <div class="card-body text-center">
+                                <h5 class="card-title">Leave Requests</h5>
+                                <a href="{% url 'leaves:request-leave' %}" class="btn btn-success btn-lg">
+                                    <i class="fas fa-plus-circle"></i> New Request
+                                </a>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <div class="col-md-6 mb-3">
+                        <div class="card h-100">
+                            <div class="card-body text-center">
+                                <h5 class="card-title">My History</h5>
+                                <a href="{% url 'leaves:leave-list' %}" class="btn btn-primary btn-lg">
+                                    <i class="fas fa-history"></i> View Leaves
+                                </a>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="mt-4 d-flex gap-2">
+                    {% if is_manager %}
+                    <a href="{% url 'leaves:manager-dashboard' %}" class="btn btn-warning">
+                        <i class="fas fa-tasks"></i> Manager Dashboard
+                    </a>
+                    {% endif %}
+                    {% if is_hr_manager %}
+                    <a href="{% url 'leaves:hr-manager-dashboard' %}" class="btn btn-danger">
+                        <i class="fas fa-user-shield"></i> HR Dashboard
+                    </a>
+                    {% endif %}
+                </div>
+                
+            {% else %}
+                <div class="alert alert-info">
+                    <h4>Please login to continue</h4>
+                    <a href="{% url 'login' %}" class="btn btn-primary btn-lg mt-2">
+                        <i class="fas fa-sign-in-alt"></i> Login
+                    </a>
+                </div>
+            {% endif %}
+        </div>
+    </div>
+</div>
+
+<!-- Add Font Awesome for icons -->
+<!-- <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.4/css/all.min.css"> -->
+{% endblock %}

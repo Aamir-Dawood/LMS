@@ -1,0 +1,52 @@
+{% extends 'base.html' %}
+
+{% block content %}
+<div class="container mt-4">
+    <div class="card">
+        <div class="card-header bg-secondary text-white">
+            <h3>Leave Request Details</h3>
+        </div>
+        <div class="card-body">
+            <div class="row mb-4">
+                <div class="col-md-6">
+                    <h5>Employee</h5>
+                    <p class="mb-1"><strong>Name:</strong> {{ leave.employee.get_full_name|default:leave.employee.username }}</p>
+                    <p class="mb-1"><strong>Department:</strong> {{ leave.employee.department.name }}</p>
+                </div>
+                <div class="col-md-6">
+                    <h5>Leave</h5>
+                    <p class="mb-1"><strong>Type:</strong> {{ leave.get_leave_type_display }}</p>
+                    <p class="mb-1"><strong>Dates:</strong> {{ leave.start_date|date:"M d, Y" }} – {{ leave.end_date|date:"M d, Y" }}</p>
+                    <p class="mb-1"><strong>Days:</strong> {{ leave.days_requested }}</p>
+                    <p class="mb-1"><strong>Status:</strong>
+                        <span class="badge bg-{% if leave.status == 'approved' %}success{% elif leave.status == 'rejected' %}danger{% else %}warning{% endif %}">
+                            {{ leave.get_status_display }}
+                        </span>
+                    </p>
+                </div>
+            </div>
+
+            <div class="mb-4 p-3 bg-light rounded">
+                <h5>Reason</h5>
+                <p class="mb-0">{{ leave.reason }}</p>
+            </div>
+
+            {% if leave.comments %}
+            <div class="mb-4 p-3 bg-light rounded">
+                <h5>Manager/HR Comments</h5>
+                <p class="mb-1">{{ leave.comments }}</p>
+                {% if leave.approved_by %}
+                <p class="text-muted small mb-0">Updated by: {{ leave.approved_by.get_full_name|default:leave.approved_by.username }}</p>
+                {% endif %}
+            </div>
+            {% endif %}
+
+            <a href="{% url 'leaves:leave-list' %}" class="btn btn-outline-secondary">
+                <i class="fas fa-arrow-left me-2"></i>Back to My Leave Requests
+            </a>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+
