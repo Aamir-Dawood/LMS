@@ -1,26 +1,39 @@
 pipeline {
     agent any
 
+    options {
+        // Keeps your 30GB disk clean by only saving 5 builds
+        buildDiscarder(logRotator(numToKeepStr: '5'))
+        timeout(time: 20, unit: 'MINUTES')
+    }
+
     stages {
-        stage('Connection Test') {
+        stage('Checkout') {
             steps {
-                echo 'Successfully connected to GitHub!'
-                sh 'uptime'
-                sh 'whoami'
+                checkout scm
             }
         }
-        stage('Environment Check') {
+        stage('Build Docker Image') {
             steps {
-                echo 'Checking server tools...'
-                sh 'docker --version || echo "Docker not installed yet"'
-                sh 'java -version'
+                // This builds your app into a reusable image
+                sh 'docker build -t lms-app:latest .'
+            }
+        }
+        stage('Deploy to Production') {
+            steps {
+                script {
+                    // Stop old version, delete it, and run the new one on Port 80
+                    sh 'docker stop lms-container || true'
+                    sh 'docker rm lms-container || true'
+                    sh 'docker run -d --name lms-container -p 80:3000 lms-app:latest'
+                }
             }
         }
     }
     
     post {
-        always {
-            echo 'Test complete.'
+        success {
+            echo 'App is live! Check your AWS Public IP.'
         }
     }
 }
