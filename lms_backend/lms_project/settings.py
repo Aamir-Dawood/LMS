@@ -29,9 +29,9 @@ if SECRET_KEY.startswith('django-insecure-') and os.environ.get('DJANGO_SECRET_K
 # DEBUG should be set via environment in production. Accept common truthy values.
 DEBUG = os.environ.get('DJANGO_DEBUG', 'True').lower() in ('1', 'true', 'yes')
 
-# Allow configuring hosts via comma-separated env var, default empty for dev
-_allowed = os.environ.get('DJANGO_ALLOWED_HOSTS', '')
-ALLOWED_HOSTS = [h for h in [host.strip() for host in _allowed.split(',')] if h] if _allowed else []
+# Allow configuring hosts via comma-separated env var, default '*' to allow all for easier testing
+_allowed = os.environ.get('DJANGO_ALLOWED_HOSTS', '*')
+ALLOWED_HOSTS = [h for h in [host.strip() for host in _allowed.split(',')] if h] if _allowed else ['*']
 
 
 # Application definition
