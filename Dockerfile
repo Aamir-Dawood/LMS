@@ -3,7 +3,9 @@ FROM node:18-alpine AS frontend-build
 WORKDIR /app/frontend
 # Use your exact folder name 'lms_frontend'
 COPY lms_frontend/package*.json ./
-RUN npm install
+
+RUN npm install --legacy-peer-deps
+
 COPY lms_frontend/ ./
 RUN npm run build
 
