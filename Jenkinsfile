@@ -2,38 +2,57 @@ pipeline {
     agent any
 
     options {
-        // Keeps your 30GB disk clean by only saving 5 builds
+        // Keeps your AWS disk clean by only saving the last 5 builds
         buildDiscarder(logRotator(numToKeepStr: '5'))
-        timeout(time: 20, unit: 'MINUTES')
+        // Stops the build if it hangs for more than 15 minutes
+        timeout(time: 15, unit: 'MINUTES')
     }
 
     stages {
-        stage('Checkout') {
+        stage('Checkout SCM') {
             steps {
+                // Pulls your latest code from GitHub
                 checkout scm
             }
         }
+
         stage('Build Docker Image') {
             steps {
-                // This builds your app into a reusable image
+                echo 'Building the Full-Stack Docker Image...'
+                // Uses the Dockerfile in your root directory
                 sh 'docker build -t lms-app:latest .'
             }
         }
-        stage('Deploy to Production') {
+
+        stage('Clean Old Deployment') {
             steps {
+                echo 'Cleaning up any existing containers...'
                 script {
-                    // Stop old version, delete it, and run the new one on Port 80
+                    // || true prevents the build from failing if the container doesn't exist yet
                     sh 'docker stop lms-container || true'
                     sh 'docker rm lms-container || true'
-                    sh 'docker run -d --name lms-container -p 80:3000 lms-app:latest'
                 }
             }
         }
+
+        stage('Deploy to Production') {
+            steps {
+                echo 'Starting the LMS Application on Port 80...'
+                // Maps AWS Port 80 to your App Port 3000
+                sh 'docker run -d --name lms-container -p 80:3000 lms-app:latest'
+            }
+        }
     }
-    
+
     post {
         success {
-            echo 'App is live! Check your AWS Public IP.'
+            echo '--------------------------------------------------'
+            echo 'SUCCESS: Your Leave Management System is now LIVE!'
+            echo 'Access it via your AWS Public IP address.'
+            echo '--------------------------------------------------'
+        }
+        failure {
+            echo 'Build failed. Check the Console Output for errors.'
         }
     }
 }
