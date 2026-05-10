@@ -1,5 +1,5 @@
 # --- Stage 1: Build the React/Vite Frontend ---
-FROM node:18-alpine AS frontend-build
+FROM node:22-alpine AS frontend-build
 WORKDIR /app/frontend
 # Use your exact folder name 'lms_frontend'
 COPY lms_frontend/package*.json ./
